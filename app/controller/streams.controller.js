@@ -1,18 +1,24 @@
 const upload = require("../middleware/multer.middleware");
-const { responsestatusmessage, responsestatusdata } = require("../middleware/responses");
-const streamModel = require("../model/stream.model");
+const {
+  responsestatusmessage,
+  responsestatusdata,
+} = require("../middleware/responses");
+const streamModel = require("../model/streams.model");
 
 // Add a new stream
 exports.addStream = async (req, res) => {
   // Call the upload middleware for 'image' field
-  upload.single("image")(req, res, async () => {
+  upload.single("stream")(req, res, async () => {
     try {
       const { title } = req.body;
-      console.log(title, req.file);
 
       // Ensure title and image are provided
       if (!title || !req.file) {
-        return responsestatusmessage(res, false, "Title and image are required.");
+        return responsestatusmessage(
+          res,
+          false,
+          "Title and image are required."
+        );
       }
 
       const imagePath = `${req.file.fieldname}/${req.file.generatedName}`;
@@ -25,7 +31,12 @@ exports.addStream = async (req, res) => {
 
       await newStream.save();
 
-      return responsestatusdata(res, true, "Stream added successfully", newStream);
+      return responsestatusdata(
+        res,
+        true,
+        "Stream added successfully",
+        newStream
+      );
     } catch (error) {
       console.error(error);
       return responsestatusmessage(res, false, "Something went wrong.");
@@ -35,7 +46,7 @@ exports.addStream = async (req, res) => {
 
 // Delete a stream by ID
 exports.deleteStream = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
 
   try {
     const deletedStream = await streamModel.findByIdAndDelete(id);
@@ -56,4 +67,40 @@ exports.getStreams = async (req, res) => {
   } catch (error) {
     return responsestatusmessage(res, false, "Error fetching streams");
   }
+};
+
+// updateStream
+exports.updateStream = async (req, res) => {
+  upload.single("stream")(req, res, async () => {
+    try {
+      const { id, title } = req.body;
+
+      if (!id || !title) {
+        return responsestatusmessage(res, false, "ID and title are required.");
+      }
+
+      // Find the existing stream document
+      const existingStream = await streamModel.findById(id);
+      if (!existingStream) {
+        return responsestatusmessage(res, false, "Stream not found.");
+      }
+
+      // Determine whether to use existing image or new one
+      let imagePath = existingStream.image;
+      if (req.file) {
+        imagePath = `${req.file.fieldname}/${req.file.generatedName}`;
+      }
+
+      // Update fields
+      existingStream.title = title;
+      existingStream.image = imagePath;
+
+      await existingStream.save();
+
+      return responsestatusdata(res, true, "Stream updated successfully", existingStream);
+    } catch (error) {
+      console.error(error);
+      return responsestatusmessage(res, false, "Something went wrong.");
+    }
+  });
 };
