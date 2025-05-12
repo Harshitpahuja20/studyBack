@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const categorySchema = new mongoose.Schema(
+const streamSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -13,6 +13,6 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const categoryModel = mongoose.model("category", categorySchema);
+const streamModel = mongoose.model("stream", streamSchema);
 
-module.exports = categoryModel;
+module.exports = streamModel;

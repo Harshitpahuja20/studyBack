@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const categorySchema = new mongoose.Schema(
+const placeSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -13,6 +13,6 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const categoryModel = mongoose.model("category", categorySchema);
+const placeModel = mongoose.model("place", placeSchema);
 
-module.exports = categoryModel;
+module.exports = placeModel;

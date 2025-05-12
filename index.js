@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const appRoutes = require("./app/routes/app.routes");
 require("dotenv").config()
@@ -7,6 +8,7 @@ require("dotenv").config()
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.use("/api", appRoutes);
 app.use("/", express.static(path.join(__dirname, "public", "uploads")));

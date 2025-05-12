@@ -1,3 +1,4 @@
+const upload = require("../middleware/multer.middleware");
 const {
   responsestatusmessage,
   responsestatusdata,
@@ -13,7 +14,7 @@ exports.addCategory = async (req, res) => {
       if (!title || !req.file) {
         return responsestatusmessage(
           res,
-          "fail",
+          false,
           "Name and image are required."
         );
       }
@@ -29,13 +30,13 @@ exports.addCategory = async (req, res) => {
 
       return responsestatusdata(
         res,
-        "success",
+        true,
         "Category added successfully",
         newCategory
       );
     } catch (error) {
       console.error(error);
-      return responsestatusmessage(res, "fail", "Something went wrong.");
+      return responsestatusmessage(res, false, "Something went wrong.");
     }
   });
 };
