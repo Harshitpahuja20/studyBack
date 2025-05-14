@@ -19,6 +19,10 @@ const {
   loginFranchise,
   getFranchises,
   getCurrentRole,
+  getSingleFranchise,
+  deleteFranchise,
+  updateFranchise,
+  addBalance,
 } = require("../controller/franchise.controller");
 const { getUser, authAdmin } = require("../middleware/auth.middleWare");
 const {
@@ -28,13 +32,17 @@ const {
   updateStream,
 } = require("../controller/streams.controller");
 const { addPlace, getPlaces, deletePlace, updatePlace } = require("../controller/place.controller");
+const { createNews, getNews, deleteNews } = require("../controller/news.controller");
 
 const router = express.Router();
 
 // franchise as user
-router.post("/franchise/create", addFranchise);
+router.post("/franchise/add", addFranchise);
 router.post("/login", loginFranchise);
 router.get("/franchise/view", getFranchises);
+router.get("/franchise/:id", getSingleFranchise);
+router.put("/franchise/update", updateFranchise);
+router.put("/franchise/addBalance", addBalance);
 router.get("/getCurrentRole", getUser, getCurrentRole);
 
 // stream routes
@@ -60,9 +68,9 @@ router.get("/studentQuery/view", getStudentQuery);
 router.delete("/studentQuery/delete/:id", deleteStudentQuery);``
 
 // student query query routes
-router.post("/news/create", createStudentQuery);
-router.get("/news/view", getStudentQuery);
-router.delete("/news/delete", deleteStudentQuery);
+router.post("/news/add", authAdmin, createNews);
+router.get("/news/view", getNews);
+router.delete("/news/delete/:id", authAdmin, deleteNews);
 
 // franchise Request
 router.post("/franchiseRequest/create", createFranchiseRequest);

@@ -5,7 +5,7 @@ const newsSchema = new mongoose.Schema(
     heading: {
       type: String,
     },
-    shortDecription: {
+    shortDescription: {
       type: String,
     },
     description: {
