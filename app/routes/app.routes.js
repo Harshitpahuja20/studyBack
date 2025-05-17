@@ -32,7 +32,8 @@ const {
   updateStream,
 } = require("../controller/streams.controller");
 const { addPlace, getPlaces, deletePlace, updatePlace } = require("../controller/place.controller");
-const { createNews, getNews, deleteNews } = require("../controller/news.controller");
+const { createNews, getNews, deleteNews, updateNews } = require("../controller/news.controller");
+const { addInstitute, getInstitutes, deleteInstitute, updateInstitute } = require("../controller/institiute.controller");
 
 const router = express.Router();
 
@@ -42,6 +43,7 @@ router.post("/login", loginFranchise);
 router.get("/franchise/view", getFranchises);
 router.get("/franchise/:id", getSingleFranchise);
 router.put("/franchise/update", updateFranchise);
+router.put("/franchise/delete", deleteFranchise);
 router.put("/franchise/addBalance", addBalance);
 router.get("/getCurrentRole", getUser, getCurrentRole);
 
@@ -50,6 +52,12 @@ router.post("/stream/create", authAdmin, addStream);
 router.get("/stream/view", getStreams);
 router.delete("/stream/delete/:id", authAdmin, deleteStream);
 router.put("/stream/update", authAdmin, updateStream);
+
+// institute routes
+router.post("/institute/add", authAdmin, addInstitute);
+router.get("/institute/view", getInstitutes);
+router.delete("/institute/delete/:id", authAdmin, deleteInstitute);
+router.put("/institute/update", authAdmin, updateInstitute);
 
 // place routes
 router.post("/place/create", authAdmin, addPlace);
@@ -69,6 +77,7 @@ router.delete("/studentQuery/delete/:id", deleteStudentQuery);``
 
 // student query query routes
 router.post("/news/add", authAdmin, createNews);
+router.post("/news/update", authAdmin, updateNews);
 router.get("/news/view", getNews);
 router.delete("/news/delete/:id", authAdmin, deleteNews);
 
