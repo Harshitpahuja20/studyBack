@@ -1,19 +1,26 @@
-const studentQueryModel = require("../model/contact.model");
-
 const {
   responsestatusmessage,
   responsestatusdata,
 } = require("../middleware/responses");
+const subCourseModel = require("../model/subCourse.model");
+const mainCourseModel = require("../model/mainCourse.model");
+const studentQueryModel = require("../model/studentQuery.model");
 
 exports.createStudentQuery = async (req, res) => {
-  const { fullName, subject, phoneNumber, course } = req.body; // Adjust to match your schema
+  const { fullName, subjectId, phoneNumber, courseId } = req.body; // Adjust to match your schema
 
   try {
+    const courseData = await mainCourseModel.findById(courseId);
+    const subjectData = await subCourseModel.findById(subjectId);
+    console.log(courseData)
+    console.log(subjectData)
     const newStudentQuery = await studentQueryModel.create({
       fullName,
-      subject,
+      subjectName : subjectData?.heading,
       phoneNumber,
-      course,
+      courseName : courseData?.heading,
+      subjectId,
+      courseId,
     });
 
     return responsestatusdata(
@@ -26,8 +33,7 @@ exports.createStudentQuery = async (req, res) => {
     return responsestatusmessage(
       res,
       false,
-      "Error creating Query option",
-      error.message
+      "Something went wrong"
     );
   }
 };

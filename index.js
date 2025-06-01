@@ -12,6 +12,9 @@ app.use(cors());
 
 app.use("/api", appRoutes);
 app.use("/", express.static(path.join(__dirname, "public", "uploads")));
+app.get("/", (req , res) => {
+  res.send("Hello")
+});
 
 mongoose
   .connect(process.env.MONGO_DB || "mongodb+srv://study:0123456789@cluster0.6ivygrg.mongodb.net")

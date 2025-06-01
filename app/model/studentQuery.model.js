@@ -5,10 +5,18 @@ const studentQuerySchema = new mongoose.Schema(
     fullName: {
       type: String,
     },
-    subject: {
+    subjectId: {
+      type: mongoose.Types.ObjectId,
+      ref: "subCourse",
+    },
+    courseId: {
+      type: mongoose.Types.ObjectId,
+      ref: "mainCourse",
+    },
+    subjectName: {
       type: String,
     },
-    course: {
+    courseName: {
       type: String,
     },
     phoneNumber: {

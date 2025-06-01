@@ -31,9 +31,59 @@ const {
   deleteStream,
   updateStream,
 } = require("../controller/streams.controller");
-const { addPlace, getPlaces, deletePlace, updatePlace } = require("../controller/place.controller");
-const { createNews, getNews, deleteNews, updateNews } = require("../controller/news.controller");
-const { addInstitute, getInstitutes, deleteInstitute, updateInstitute } = require("../controller/institiute.controller");
+const {
+  addPlace,
+  getPlaces,
+  deletePlace,
+  updatePlace,
+} = require("../controller/place.controller");
+const {
+  createNews,
+  getNews,
+  deleteNews,
+  updateNews,
+} = require("../controller/news.controller");
+const {
+  addInstitute,
+  getInstitutes,
+  deleteInstitute,
+  updateInstitute,
+} = require("../controller/institiute.controller");
+const {
+  addStudent,
+  getStudents,
+  updateStudent,
+  getSingleStudent,
+  deleteStudent,
+  studentVerification,
+} = require("../controller/student.controller");
+const {
+  addMainCourse,
+  getMainCourses,
+  deleteMainCourse,
+  updateMainCourse,
+} = require("../controller/mainCourse.controller");
+const {
+  addSubCourse,
+  getSubCourses,
+  deleteSubCourse,
+  updateSubCourse,
+  getSubCoursesbyId,
+} = require("../controller/SubCourse.controller");
+const {
+  addVocationalCourse,
+  getVocationalCourses,
+  deleteVocationalCourse,
+  updateVocationalCourse,
+  getFranchiseVocationalCourse,
+} = require("../controller/vocationalCourse.controller");
+const {
+  addSubject,
+  getSubjectsByCourseId,
+  deleteSubject,
+  updateSubject,
+} = require("../controller/subject.controller");
+const { getAdminStatistics } = require("../controller/Statistics.controller");
 
 const router = express.Router();
 
@@ -56,8 +106,50 @@ router.put("/stream/update", authAdmin, updateStream);
 // institute routes
 router.post("/institute/add", authAdmin, addInstitute);
 router.get("/institute/view", getInstitutes);
-router.delete("/institute/delete/:id", authAdmin, deleteInstitute);
+router.delete("/institute/view/:id", authAdmin, getSingleStudent);
 router.put("/institute/update", authAdmin, updateInstitute);
+
+// student routes
+router.post("/student/add", authAdmin, addStudent);
+router.get("/student/view", getStudents);
+router.delete("/student/delete/:id", authAdmin, deleteStudent);
+router.get("/student/view/:id", authAdmin, getSingleStudent);
+router.put("/student/update", authAdmin, updateStudent);
+router.post("/student/studentVerification", studentVerification);
+
+// main course routes
+router.post("/mainCourse/add", authAdmin, addMainCourse);
+router.get("/mainCourse/view", getMainCourses);
+router.delete("/mainCourse/delete/:id", authAdmin, deleteMainCourse);
+router.put("/mainCourse/update", authAdmin, updateMainCourse);
+
+// sub courses
+router.post("/subCourse/add", authAdmin, addSubCourse);
+router.get("/subCourse/view", getSubCourses);
+router.get("/subCourse/view/:id", getSubCoursesbyId);
+router.delete("/subCourse/delete/:id", authAdmin, deleteSubCourse);
+router.put("/subCourse/update", authAdmin, updateSubCourse);
+
+// vocational courses
+router.post("/vocationalCourse/add", authAdmin, addVocationalCourse);
+router.get("/vocationalCourse/view", getVocationalCourses);
+router.get(
+  "/vocationalCourse/franchise/view",
+  authAdmin,
+  getFranchiseVocationalCourse
+);
+router.delete(
+  "/vocationalCourse/delete/:id",
+  authAdmin,
+  deleteVocationalCourse
+);
+router.put("/vocationalCourse/update", authAdmin, updateVocationalCourse);
+
+// subject routes
+router.post("/subject/add", authAdmin, addSubject);
+router.get("/subject/view/:id", getSubjectsByCourseId);
+router.delete("/subject/delete/:id", authAdmin, deleteSubject);
+router.put("/subject/update", authAdmin, updateSubject);
 
 // place routes
 router.post("/place/create", authAdmin, addPlace);
@@ -73,7 +165,7 @@ router.delete("/contactQuery/delete/:id", deleteContact);
 // student query query routes
 router.post("/studentQuery/create", createStudentQuery);
 router.get("/studentQuery/view", getStudentQuery);
-router.delete("/studentQuery/delete/:id", deleteStudentQuery);``
+router.delete("/studentQuery/delete/:id", deleteStudentQuery);
 
 // student query query routes
 router.post("/news/add", authAdmin, createNews);
@@ -85,5 +177,8 @@ router.delete("/news/delete/:id", authAdmin, deleteNews);
 router.post("/franchiseRequest/create", createFranchiseRequest);
 router.get("/franchiseRequest/view", getFranchiseRequests);
 router.delete("/franchiseRequest/delete/:id", deleteFranchiseRequest);
+
+// statistics
+router.get("/statistics/admin", authAdmin, getAdminStatistics);
 
 module.exports = router;
