@@ -106,7 +106,7 @@ router.put("/stream/update", authAdmin, updateStream);
 // institute routes
 router.post("/institute/add", authAdmin, addInstitute);
 router.get("/institute/view", getInstitutes);
-router.delete("/institute/view/:id", authAdmin, getSingleStudent);
+router.delete("/institute/delete/:id", authAdmin, deleteInstitute);
 router.put("/institute/update", authAdmin, updateInstitute);
 
 // student routes

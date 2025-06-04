@@ -6,10 +6,6 @@ const InstituteSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    instituteUrl: {
-      type: String,
-      trim: true,
-    },
     address: {
       type: String,
       trim: true,

@@ -9,6 +9,9 @@ const streamSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    university: {
+      type: Array,
+    },
   },
   { timestamps: true }
 );

@@ -57,7 +57,7 @@ exports.getSubjectsByCourseId = async (req, res) => {
   try {
     const subjects = await SubjectModel.find({
       vocationalCourseId: new mongoose.Types.ObjectId(id),
-    }).sort({ createdAt: -1 });
+    });
     return responsestatusdata(
       res,
       true,

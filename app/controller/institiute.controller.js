@@ -12,7 +12,6 @@ exports.addInstitute = async (req, res) => {
     try {
       const {
         instituteName,
-        instituteUrl,
         address,
         approvedBy,
         city,
@@ -23,7 +22,7 @@ exports.addInstitute = async (req, res) => {
       } = req.body;
 
       // Ensure required fields and logo are provided
-      if (!instituteName || !instituteUrl || !description || !req.file) {
+      if (!instituteName || !description || !req.file) {
         return responsestatusmessage(
           res,
           false,
@@ -36,7 +35,6 @@ exports.addInstitute = async (req, res) => {
       // Create a new institute document
       const newInstitute = new instituteModel({
         instituteName,
-        instituteUrl,
         address,
         approvedBy,
         city,
