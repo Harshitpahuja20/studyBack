@@ -18,7 +18,7 @@ exports.addInstitute = async (req, res) => {
         state,
         instituteType,
         description,
-        role
+        role,
       } = req.body;
 
       // Ensure required fields and logo are provided
@@ -42,7 +42,7 @@ exports.addInstitute = async (req, res) => {
         instituteType,
         instituteLogo: logoPath, // Store the logo path
         description,
-        role
+        role,
       });
 
       await newInstitute.save();
@@ -79,15 +79,41 @@ exports.deleteInstitute = async (req, res) => {
 // Get all institutes
 exports.getInstitutes = async (req, res) => {
   try {
-    console.log(req.query)
     const { role } = req.query;
     let matches = {};
     if (role) {
-      matches = {
-        role
-      }
-    }
-    const institutes = await instituteModel.find(matches);
+      matches.role = role;
+    } // Build aggregation pipeline dynamically
+
+    const pipeline = [{ $match: matches }];
+
+    if (role === "University") {
+      pipeline.push(
+        {
+          $lookup: {
+            from: "streams",
+            let: { instituteId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $in: ["$$instituteId", "$university"] },
+                },
+              },
+              {
+                $project: { _id: 1, title: 1 },
+              },
+            ],
+            as: "linkedStreams",
+          },
+        },
+        {
+          $match: { "linkedStreams.0": { $exists: true } },
+        }
+      );
+    } // Project final fields: always include _id, title, and linkedStreams if present
+
+    const institutes = await instituteModel.aggregate(pipeline);
+
     return responsestatusdata(res, true, "Fetched Successfully", institutes);
   } catch (error) {
     console.error(error);
@@ -109,7 +135,7 @@ exports.updateInstitute = async (req, res) => {
         state,
         instituteType,
         description,
-        role
+        role,
       } = req.body;
 
       if (!id || !instituteName || !instituteUrl || !description) {

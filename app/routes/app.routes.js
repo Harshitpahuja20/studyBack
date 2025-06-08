@@ -24,12 +24,13 @@ const {
   updateFranchise,
   addBalance,
 } = require("../controller/franchise.controller");
-const { getUser, authAdmin } = require("../middleware/auth.middleWare");
+const { getUser, authAdmin, auth } = require("../middleware/auth.middleWare");
 const {
   addStream,
   getStreams,
   deleteStream,
   updateStream,
+  updateAttachment,
 } = require("../controller/streams.controller");
 const {
   addPlace,
@@ -83,7 +84,8 @@ const {
   deleteSubject,
   updateSubject,
 } = require("../controller/subject.controller");
-const { getAdminStatistics } = require("../controller/Statistics.controller");
+const { getAdminStatistics, getAdminHomeStatistics } = require("../controller/Statistics.controller");
+const { addMarks, getAllResults, getResultById, deleteResult, updateMarks } = require("../controller/studentMarks.controller");
 
 const router = express.Router();
 
@@ -102,6 +104,7 @@ router.post("/stream/create", authAdmin, addStream);
 router.get("/stream/view", getStreams);
 router.delete("/stream/delete/:id", authAdmin, deleteStream);
 router.put("/stream/update", authAdmin, updateStream);
+router.put("/stream/update/attachment", authAdmin, updateAttachment);
 
 // institute routes
 router.post("/institute/add", authAdmin, addInstitute);
@@ -115,6 +118,8 @@ router.get("/student/view", getStudents);
 router.delete("/student/delete/:id", authAdmin, deleteStudent);
 router.get("/student/view/:id", authAdmin, getSingleStudent);
 router.put("/student/update", authAdmin, updateStudent);
+router.post("/student/addMarks",authAdmin, addMarks);
+router.put("/student/updateMarks",authAdmin, updateMarks);
 router.post("/student/studentVerification", studentVerification);
 
 // main course routes
@@ -131,19 +136,15 @@ router.delete("/subCourse/delete/:id", authAdmin, deleteSubCourse);
 router.put("/subCourse/update", authAdmin, updateSubCourse);
 
 // vocational courses
-router.post("/vocationalCourse/add", authAdmin, addVocationalCourse);
-router.get("/vocationalCourse/view", getVocationalCourses);
+router.post("/vocationalCourse/add", auth, addVocationalCourse);
+router.get("/vocationalCourse/view", authAdmin, getVocationalCourses);
 router.get(
   "/vocationalCourse/franchise/view",
-  authAdmin,
+  auth,
   getFranchiseVocationalCourse
 );
-router.delete(
-  "/vocationalCourse/delete/:id",
-  authAdmin,
-  deleteVocationalCourse
-);
-router.put("/vocationalCourse/update", authAdmin, updateVocationalCourse);
+router.delete("/vocationalCourse/delete/:id", auth, deleteVocationalCourse);
+router.put("/vocationalCourse/update", auth, updateVocationalCourse);
 
 // subject routes
 router.post("/subject/add", authAdmin, addSubject);
@@ -180,5 +181,11 @@ router.delete("/franchiseRequest/delete/:id", deleteFranchiseRequest);
 
 // statistics
 router.get("/statistics/admin", authAdmin, getAdminStatistics);
+router.get("/statistics/admin/home", authAdmin, getAdminHomeStatistics);
+
+// statistics
+router.get("/admin/result/view", authAdmin, getAllResults);
+router.get("/admin/result/view/:id", authAdmin, getResultById);
+router.delete("/admin/result/delete/:id", authAdmin, deleteResult);
 
 module.exports = router;

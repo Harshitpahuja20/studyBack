@@ -91,7 +91,7 @@ exports.getFranchiseVocationalCourse = async (req, res) => {
     const course = await VocationalCourseModel.aggregate([
       {
         $match: {
-          franchiseId: new mongoose.Types.ObjectId(user),
+          franchiseId: new mongoose.Types.ObjectId(user?._id),
         },
       },
       {
@@ -99,6 +99,9 @@ exports.getFranchiseVocationalCourse = async (req, res) => {
           _id: 1,
           name: 1,
           duration: 1,
+          amount: 1,
+          mode: 1,
+          code: 1
         },
       },
     ]);

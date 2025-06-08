@@ -1,8 +1,10 @@
+const { default: mongoose } = require("mongoose");
 const upload = require("../middleware/multer.middleware");
 const {
   responsestatusmessage,
   responsestatusdata,
 } = require("../middleware/responses");
+const studentMarksModel = require("../model/studentMarks.model");
 const studentModel = require("../model/studentsSchema");
 
 // Add a new student
@@ -82,18 +84,31 @@ exports.addStudent = async (req, res) => {
 // Delete a student by ID
 exports.getSingleStudent = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const student = await studentModel
-      .findById(id)
-      .populate("franchiseId", "franchiseName _id")
-      .populate("course", "name duration");
+    const [student, result] = await Promise.all([
+      studentModel
+        .findById(id)
+        .populate("franchiseId", "franchiseName _id")
+        .populate("course", "name duration"),
+      studentMarksModel.findOne({
+        studentId: new mongoose.Types.ObjectId(id),
+      }),
+    ]);
+
     if (!student) {
       return responsestatusmessage(res, false, "Student not found.");
     }
-    return responsestatusdata(res, true, "Student Details Fetched", student);
+
+    const studentData = {
+      ...student._doc,
+      studentResultId: result ? result._id : null,
+    };
+
+    return responsestatusdata(res, true, "Student Details Fetched", studentData);
   } catch (error) {
     console.error(error);
-    return responsestatusmessage(res, false, "Error deleting student.");
+    return responsestatusmessage(res, false, "Error fetching student.");
   }
 };
 
@@ -250,7 +265,7 @@ exports.deleteStudent = async (req, res) => {
 exports.studentVerification = async (req, res) => {
   const { enrollmentId, dob } = req.body;
 
-  console.log(enrollmentId, dob)
+  console.log(enrollmentId, dob);
 
   if (!enrollmentId || !dob) {
     return responsestatusmessage(res, false, "Both fields are reuired");

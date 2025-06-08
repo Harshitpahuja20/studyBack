@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const upload = require("../middleware/multer.middleware");
 const {
   responsestatusmessage,
@@ -97,10 +98,56 @@ exports.updateStream = async (req, res) => {
 
       await existingStream.save();
 
-      return responsestatusdata(res, true, "Stream updated successfully", existingStream);
+      return responsestatusdata(
+        res,
+        true,
+        "Stream updated successfully",
+        existingStream
+      );
     } catch (error) {
       console.error(error);
       return responsestatusmessage(res, false, "Something went wrong.");
     }
   });
 };
+
+exports.updateAttachment = async (req, res) => {
+  try {
+    const { streamId, University } = req.body;
+
+    // Make sure it's an array
+    if (!Array.isArray(University)) {
+      return responsestatusmessage(
+        res,
+        false,
+        'University must be an array of string ObjectIds.'
+      );
+    }
+
+    // Convert valid ObjectIds
+    const universityObjectIds = University
+      .filter((id) => mongoose.isValidObjectId(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
+    const updatedStream = await streamModel.findByIdAndUpdate(
+      streamId,
+      { university: universityObjectIds },
+      { new: true }
+    );
+
+    if (!updatedStream) {
+      return responsestatusmessage(res, false, 'Stream not found');
+    }
+
+    return responsestatusdata(
+      res,
+      true,
+      'Attachment updated successfully',
+      updatedStream
+    );
+  } catch (error) {
+    console.error('Error in updateAttachment:', error);
+    return responsestatusmessage(res, false, 'Server error');
+  }
+};
+
