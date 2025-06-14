@@ -24,7 +24,12 @@ const {
   updateFranchise,
   addBalance,
 } = require("../controller/franchise.controller");
-const { getUser, authAdmin, auth } = require("../middleware/auth.middleWare");
+const {
+  getUser,
+  authAdmin,
+  auth,
+  authFranchise,
+} = require("../middleware/auth.middleWare");
 const {
   addStream,
   getStreams,
@@ -53,10 +58,12 @@ const {
 const {
   addStudent,
   getStudents,
+  getFranchiseStudents,
   updateStudent,
   getSingleStudent,
   deleteStudent,
   studentVerification,
+  studentResult,
 } = require("../controller/student.controller");
 const {
   addMainCourse,
@@ -84,8 +91,19 @@ const {
   deleteSubject,
   updateSubject,
 } = require("../controller/subject.controller");
-const { getAdminStatistics, getAdminHomeStatistics } = require("../controller/Statistics.controller");
-const { addMarks, getAllResults, getResultById, deleteResult, updateMarks } = require("../controller/studentMarks.controller");
+const {
+  getAdminStatistics,
+  getAdminHomeStatistics,
+  getFranchiseStatistics,
+} = require("../controller/Statistics.controller");
+const {
+  addMarks,
+  getAllResults,
+  getResultById,
+  deleteResult,
+  updateMarks,
+} = require("../controller/studentMarks.controller");
+const { addTopUpRequest, getFranchiseStats, getTopUpRequestsByFranchise, getAllTopUpRequests } = require("../controller/topupRequest.controller");
 
 const router = express.Router();
 
@@ -113,14 +131,16 @@ router.delete("/institute/delete/:id", authAdmin, deleteInstitute);
 router.put("/institute/update", authAdmin, updateInstitute);
 
 // student routes
-router.post("/student/add", authAdmin, addStudent);
-router.get("/student/view", getStudents);
-router.delete("/student/delete/:id", authAdmin, deleteStudent);
-router.get("/student/view/:id", authAdmin, getSingleStudent);
-router.put("/student/update", authAdmin, updateStudent);
-router.post("/student/addMarks",authAdmin, addMarks);
-router.put("/student/updateMarks",authAdmin, updateMarks);
+router.post("/student/add", auth, addStudent);
+router.get("/student/view", authAdmin, getStudents);
+router.get("/student/franchise/view", authFranchise, getFranchiseStudents);
+router.delete("/student/delete/:id", auth, deleteStudent);
+router.get("/student/view/:id", auth, getSingleStudent);
+router.put("/student/update", auth, updateStudent);
+router.post("/student/addMarks", auth, addMarks);
+router.put("/student/updateMarks", auth, updateMarks);
 router.post("/student/studentVerification", studentVerification);
+router.post("/student/studentResult", studentResult);
 
 // main course routes
 router.post("/mainCourse/add", authAdmin, addMainCourse);
@@ -137,20 +157,20 @@ router.put("/subCourse/update", authAdmin, updateSubCourse);
 
 // vocational courses
 router.post("/vocationalCourse/add", auth, addVocationalCourse);
-router.get("/vocationalCourse/view", authAdmin, getVocationalCourses);
+router.get("/vocationalCourse/view", auth, getVocationalCourses);
 router.get(
   "/vocationalCourse/franchise/view",
-  auth,
+  authFranchise,
   getFranchiseVocationalCourse
 );
 router.delete("/vocationalCourse/delete/:id", auth, deleteVocationalCourse);
 router.put("/vocationalCourse/update", auth, updateVocationalCourse);
 
 // subject routes
-router.post("/subject/add", authAdmin, addSubject);
+router.post("/subject/add", auth, addSubject);
 router.get("/subject/view/:id", getSubjectsByCourseId);
-router.delete("/subject/delete/:id", authAdmin, deleteSubject);
-router.put("/subject/update", authAdmin, updateSubject);
+router.delete("/subject/delete/:id", auth, deleteSubject);
+router.put("/subject/update", auth, updateSubject);
 
 // place routes
 router.post("/place/create", authAdmin, addPlace);
@@ -182,10 +202,18 @@ router.delete("/franchiseRequest/delete/:id", deleteFranchiseRequest);
 // statistics
 router.get("/statistics/admin", authAdmin, getAdminStatistics);
 router.get("/statistics/admin/home", authAdmin, getAdminHomeStatistics);
+router.get("/statistics/franchise", authFranchise, getFranchiseStatistics);
 
 // statistics
 router.get("/admin/result/view", authAdmin, getAllResults);
 router.get("/admin/result/view/:id", authAdmin, getResultById);
 router.delete("/admin/result/delete/:id", authAdmin, deleteResult);
+
+// subject routes
+router.post("/topupRequest/add", authFranchise, addTopUpRequest);
+router.get("/topupRequest/view/franchise", authFranchise  , getTopUpRequestsByFranchise);
+router.get("/topupRequest/view/admin",authAdmin, getAllTopUpRequests);
+router.put("/topupRequest/update", authAdmin, updateSubject);
+router.put("/topupRequest/stats", authAdmin, getFranchiseStats);
 
 module.exports = router;

@@ -105,7 +105,12 @@ exports.getSingleStudent = async (req, res) => {
       studentResultId: result ? result._id : null,
     };
 
-    return responsestatusdata(res, true, "Student Details Fetched", studentData);
+    return responsestatusdata(
+      res,
+      true,
+      "Student Details Fetched",
+      studentData
+    );
   } catch (error) {
     console.error(error);
     return responsestatusmessage(res, false, "Error fetching student.");
@@ -117,6 +122,74 @@ exports.getStudents = async (req, res) => {
   try {
     const { franchiseId } = req.query;
     const filter = franchiseId ? { franchiseId } : {};
+    const students = await studentModel.aggregate([
+      { $match: filter }, // Apply your dynamic filters
+      {
+        $lookup: {
+          from: "franchises", // collection name in MongoDB (usually plural and lowercase)
+          localField: "franchiseId",
+          foreignField: "_id",
+          as: "franchise",
+        },
+      },
+      {
+        $unwind: {
+          path: "$franchise",
+          preserveNullAndEmptyArrays: true, // In case some students don't have franchiseId
+        },
+      },
+      {
+        $lookup: {
+          from: "vocationalcourses", // collection name in MongoDB (usually plural and lowercase)
+          localField: "course",
+          foreignField: "_id",
+          as: "vocationalCourse",
+        },
+      },
+      {
+        $unwind: {
+          path: "$vocationalCourse",
+          preserveNullAndEmptyArrays: true, // In case some students don't have franchiseId
+        },
+      },
+      {
+        $project: {
+          studentName: 1,
+          fatherName: 1,
+          motherName: 1,
+          dob: 1,
+          gender: 1,
+          mobile: 1,
+          category: 1,
+          email: 1,
+          course: 1,
+          session: 1,
+          registrationYear: 1,
+          address: 1,
+          image: 1,
+          franchiseId: 1,
+          createdAt: 1,
+          "franchise._id": 1,
+          "franchise.fullName": 1,
+          "franchise.role": 1,
+          "vocationalCourse.duration": 1,
+          "vocationalCourse.name": 1,
+          "vocationalCourse.code": 1,
+        },
+      },
+    ]);
+
+    return responsestatusdata(res, true, "Fetched Successfully", students);
+  } catch (error) {
+    console.error(error);
+    return responsestatusmessage(res, false, "Error fetching students.");
+  }
+};
+
+exports.getFranchiseStudents = async (req, res) => {
+  try {
+    const user = req.user;
+    const filter = { franchiseId: new mongoose.Types.ObjectId(user?._id) };
     const students = await studentModel.aggregate([
       { $match: filter }, // Apply your dynamic filters
       {
@@ -282,4 +355,38 @@ exports.studentVerification = async (req, res) => {
   }
 
   return responsestatusdata(res, true, "Student details fetched", student);
+};
+
+// get student result
+
+exports.studentResult = async (req , res) => {
+  const { enrollmentId, duration } = req.body;
+  console.log(enrollmentId, duration)
+  const student = await studentModel
+    .findOne({ enrollmentId : Number(enrollmentId) })
+    .populate("course", "name duration");
+
+  if (!student) {
+    return responsestatusmessage(
+      res,
+      false,
+      "Please check the Enrollment number again"
+    );
+  }
+
+
+  if (student?.course?.duration !== duration) {
+    return responsestatusmessage(res, false, "No Result Found!");
+  }
+  console.log(student?._id)
+
+  const studentMarks = await studentMarksModel.findOne({
+    studentId: new mongoose.Types.ObjectId(student?._id),
+  });
+
+  if (!studentMarks) {
+    return responsestatusmessage(res, false, "No Result Found!");
+  }
+
+  return responsestatusdata(res, true, "Result Found!", {student , studentMarks});
 };

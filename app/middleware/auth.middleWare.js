@@ -10,6 +10,7 @@ exports.getUser = async (req, res, next) => {
     if (!token) return responsestatusmessage(res, false, "Token not found");
 
     const decoded = jwt.verify(token, jwt_secret);
+    console.log(decoded)
     const user = await franchiseModel
       .findById(decoded.id)
       .select("-password -__v");

@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const { responsestatusdata } = require("../middleware/responses");
 const ContactModel = require("../model/contact.model");
 const franchiseModel = require("../model/franchise.model");
@@ -26,7 +27,7 @@ exports.getAdminStatistics = async (req, res) => {
       totalUniversities,
       totalColleges,
       totalITIs,
-      totalContacts
+      totalContacts,
     ] = await Promise.all([
       newsModel.countDocuments(),
       streamModel.countDocuments(),
@@ -69,23 +70,52 @@ exports.getAdminStatistics = async (req, res) => {
 
 exports.getAdminHomeStatistics = async (req, res) => {
   try {
-    const [
-      totalFranchise,
-      totalStudents,
-      totalCourses,
-      totalResults,
-    ] = await Promise.all([
-      franchiseModel.countDocuments(),
-      studentModel.countDocuments(),
-      VocationalCourseModel.countDocuments(),
-      studentMarksModel.countDocuments(),
+    const [totalFranchise, totalStudents, totalCourses, totalResults] =
+      await Promise.all([
+        franchiseModel.countDocuments(),
+        studentModel.countDocuments(),
+        VocationalCourseModel.countDocuments(),
+        studentMarksModel.countDocuments(),
+      ]);
+
+    const statistics = {
+      totalFranchise: totalFranchise || 0,
+      totalStudents: totalStudents || 0,
+      totalCourses: totalCourses || 0,
+      totalResults: totalResults || 0,
+    };
+
+    return responsestatusdata(
+      res,
+      true,
+      "Statistics fetched successfully",
+      statistics
+    );
+  } catch (error) {
+    console.error(error);
+    return responsestatusmessage(res, false, "Error fetching statistics");
+  }
+};
+
+exports.getFranchiseStatistics = async (req, res) => {
+  const user = req.user;
+  try {
+    const [totalStudents, totalCourses, totalResults] = await Promise.all([
+      studentModel.countDocuments({
+        franchiseId: new mongoose.Types.ObjectId(user?._id),
+      }),
+      VocationalCourseModel.countDocuments({
+        franchiseId: new mongoose.Types.ObjectId(user?._id),
+      }),
+      studentMarksModel.countDocuments({
+        franchiseId: new mongoose.Types.ObjectId(user?._id),
+      }),
     ]);
 
     const statistics = {
-      totalFranchise : totalFranchise || 0,
-      totalStudents : totalStudents || 0,
-      totalCourses : totalCourses || 0,
-      totalResults : totalResults || 0,
+      totalStudents: totalStudents || 0,
+      totalCourses: totalCourses || 0,
+      totalResults: totalResults || 0,
     };
 
     return responsestatusdata(
