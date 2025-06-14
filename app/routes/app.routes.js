@@ -64,6 +64,8 @@ const {
   deleteStudent,
   studentVerification,
   studentResult,
+  applyResult,
+  getStudentsForResults,
 } = require("../controller/student.controller");
 const {
   addMainCourse,
@@ -90,6 +92,7 @@ const {
   getSubjectsByCourseId,
   deleteSubject,
   updateSubject,
+  getStudentwithSubjects,
 } = require("../controller/subject.controller");
 const {
   getAdminStatistics,
@@ -103,7 +106,7 @@ const {
   deleteResult,
   updateMarks,
 } = require("../controller/studentMarks.controller");
-const { addTopUpRequest, getFranchiseStats, getTopUpRequestsByFranchise, getAllTopUpRequests } = require("../controller/topupRequest.controller");
+const { addTopUpRequest, getFranchiseStats, getTopUpRequestsByFranchise, getAllTopUpRequests, getAllTransactions } = require("../controller/topupRequest.controller");
 
 const router = express.Router();
 
@@ -133,12 +136,14 @@ router.put("/institute/update", authAdmin, updateInstitute);
 // student routes
 router.post("/student/add", auth, addStudent);
 router.get("/student/view", authAdmin, getStudents);
+router.get("/student/view/getStudentsForResults", authAdmin, getStudentsForResults);
 router.get("/student/franchise/view", authFranchise, getFranchiseStudents);
 router.delete("/student/delete/:id", auth, deleteStudent);
 router.get("/student/view/:id", auth, getSingleStudent);
 router.put("/student/update", auth, updateStudent);
 router.post("/student/addMarks", auth, addMarks);
 router.put("/student/updateMarks", auth, updateMarks);
+router.put("/student/applyResult", authFranchise, applyResult);
 router.post("/student/studentVerification", studentVerification);
 router.post("/student/studentResult", studentResult);
 
@@ -169,6 +174,7 @@ router.put("/vocationalCourse/update", auth, updateVocationalCourse);
 // subject routes
 router.post("/subject/add", auth, addSubject);
 router.get("/subject/view/:id", getSubjectsByCourseId);
+router.get("/subject/view/:id/:studentId", getStudentwithSubjects);
 router.delete("/subject/delete/:id", auth, deleteSubject);
 router.put("/subject/update", auth, updateSubject);
 
@@ -209,11 +215,12 @@ router.get("/admin/result/view", authAdmin, getAllResults);
 router.get("/admin/result/view/:id", authAdmin, getResultById);
 router.delete("/admin/result/delete/:id", authAdmin, deleteResult);
 
-// subject routes
+// topUp routes
 router.post("/topupRequest/add", authFranchise, addTopUpRequest);
 router.get("/topupRequest/view/franchise", authFranchise  , getTopUpRequestsByFranchise);
 router.get("/topupRequest/view/admin",authAdmin, getAllTopUpRequests);
 router.put("/topupRequest/update", authAdmin, updateSubject);
-router.put("/topupRequest/stats", authAdmin, getFranchiseStats);
+router.get("/topupRequest/stats", authFranchise, getFranchiseStats);
+router.get("/topupRequest/getAllTransactions", authFranchise, getAllTransactions);
 
 module.exports = router;

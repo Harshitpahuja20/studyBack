@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const topUpRequestSchema = new mongoose.Schema(
   {
-    transactionDate: {
+    walletId: {
       type: Date,
     },
-    Amount: {
+    amount: {
       type: String,
     },
     description: {
@@ -17,6 +17,12 @@ const topUpRequestSchema = new mongoose.Schema(
     },
     franchiseId: {
       type: mongoose.Types.ObjectId,
+    },
+    date: {
+      type: String,
+    },
+    method: {
+      type: String,
     },
   },
   { timestamps: true }

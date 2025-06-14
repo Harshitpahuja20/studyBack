@@ -15,11 +15,6 @@ exports.addVocationalCourse = async (req, res) => {
       return responsestatusmessage(res, false, "All fields are required.");
     }
 
-    const existing = await VocationalCourseModel.findOne({ code });
-    if (existing) {
-      return responsestatusmessage(res, false, "Course code already exists.");
-    }
-
     const newCourse = new VocationalCourseModel({
       name,
       duration,

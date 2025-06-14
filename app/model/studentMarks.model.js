@@ -20,6 +20,9 @@ const studentMarksSchema = new mongoose.Schema(
     issueDate: {
       type: Date,
     },
+    duration: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

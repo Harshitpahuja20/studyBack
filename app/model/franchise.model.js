@@ -6,7 +6,7 @@ const franchiseSchema = new mongoose.Schema(
     franchiseName: {
       type: String,
     },
-    fullName: {
+    userName: {
       type: String,
     },
     phoneNumber: {
@@ -25,6 +25,12 @@ const franchiseSchema = new mongoose.Schema(
       type: String,
     },
     image: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    city: {
       type: String,
     },
     balance: {

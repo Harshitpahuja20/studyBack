@@ -2,14 +2,35 @@ const mongoose = require("mongoose");
 
 const transactionSchema = new mongoose.Schema(
   {
-    total: {
-      type: Number,
+    transactionId: {
+      type: String,
     },
-    addAmount: {
-      type: Number,
+    enrollmentId: {
+      type: String,
     },
-    lessAmount: {
-      type: Number,
+    name: {
+      type: String,
+    },
+    fatherName: {
+      type: String,
+    },
+    dob: {
+      type: String,
+    },
+    fee: {
+      type: String,
+    },
+    course: {
+      type: String,
+    },
+    duration: {
+      type: String,
+    },
+    studentId: {
+      type: mongoose.Types.ObjectId,
+    },
+    courseId: {
+      type: mongoose.Types.ObjectId,
     },
     franchiseId: {
       type: mongoose.Types.ObjectId,

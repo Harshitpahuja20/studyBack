@@ -4,6 +4,7 @@ const {
   responsestatusmessage,
   responsestatusdata,
 } = require("../middleware/responses");
+const studentModel = require("../model/studentsSchema");
 
 // Add a new subject
 exports.addSubject = async (req, res) => {
@@ -64,6 +65,25 @@ exports.getSubjectsByCourseId = async (req, res) => {
       "Subjects fetched successfully",
       subjects
     );
+  } catch (error) {
+    console.error(error);
+    return responsestatusmessage(res, false, "Error fetching subjects.");
+  }
+};
+
+exports.getStudentwithSubjects = async (req, res) => {
+  const { id, studentId } = req.params;
+  try {
+    const subjects = await SubjectModel.find({
+      vocationalCourseId: new mongoose.Types.ObjectId(id),
+    });
+    const student = await studentModel
+      .findById(studentId)
+      .populate("course", "_id name duration amount");
+    return responsestatusdata(res, true, "Subjects fetched successfully", {
+      subjects,
+      student,
+    });
   } catch (error) {
     console.error(error);
     return responsestatusmessage(res, false, "Error fetching subjects.");

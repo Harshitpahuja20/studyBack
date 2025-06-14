@@ -14,18 +14,18 @@ exports.addFranchise = async (req, res) => {
     try {
       const {
         franchiseName,
-        fullName,
         phoneNumber,
         email,
         franchiseCode,
-        password,
+        state,
+        city,
         address,
         role,
       } = req.body;
 
-      // If role is admin, only fullName, email, and password are required
+      // If role is admin, only userName, email, and password are required
       if (role === "admin") {
-        if (!fullName || !email || !password) {
+        if (!franchiseName || !email || !password) {
           return responsestatusmessage(
             res,
             false,
@@ -39,11 +39,30 @@ exports.addFranchise = async (req, res) => {
           return responsestatusmessage(res, false, "Email is already in use.");
         }
 
+        let newSerial = 1000000; // starting number, you can change this
+        const lastFranchise = await franchiseModel
+          .findOne({ userName: { $regex: /^JBS-C\d+$/ } })
+          .sort({ userName: -1 })
+          .lean();
+
+        if (lastFranchise && lastFranchise.userName) {
+          const lastNum = parseInt(
+            lastFranchise.userName.replace("JBS-C", ""),
+            10
+          );
+          if (!isNaN(lastNum)) {
+            newSerial = lastNum + 1;
+          }
+        }
+
+        const userName = `JBS-C${newSerial}`;
+
         // Create a new franchise with the role as admin and only the necessary fields
         const newFranchise = new franchiseModel({
-          fullName,
+          franchiseName,
           email,
           password,
+          userName,
           role: "admin", // Set role as admin
         });
 
@@ -60,11 +79,11 @@ exports.addFranchise = async (req, res) => {
       // If the role is 'franchise' or not provided, proceed with normal franchise creation
       if (
         !franchiseName ||
-        !fullName ||
+        !state ||
+        !city ||
         !phoneNumber ||
         !email ||
         !franchiseCode ||
-        !password ||
         !address ||
         !req.file
       ) {
@@ -103,19 +122,40 @@ exports.addFranchise = async (req, res) => {
         return responsestatusmessage(res, false, "Email is already in use.");
       }
 
+      // 🆕 Generate serialized userName like JBS-C6826428
+      let newSerial = 1000000; // starting number, you can change this
+      const lastFranchise = await franchiseModel
+        .findOne({ userName: { $regex: /^JBS-C\d+$/ } })
+        .sort({ userName: -1 })
+        .lean();
+
+      if (lastFranchise && lastFranchise.userName) {
+        const lastNum = parseInt(
+          lastFranchise.userName.replace("JBS-C", ""),
+          10
+        );
+        if (!isNaN(lastNum)) {
+          newSerial = lastNum + 1;
+        }
+      }
+
+      const userName = `JBS-C${newSerial}`;
+
       // Image path
       const imagePath = `${req.file.fieldname}/${req.file.generatedName}`;
 
       // Create a new franchise document
       const newFranchise = new franchiseModel({
         franchiseName,
-        fullName,
+        userName,
         phoneNumber,
         email,
         franchiseCode,
-        password,
+        password: userName,
         address,
         image: imagePath,
+        state,
+        city,
       });
 
       await newFranchise.save();
@@ -139,12 +179,14 @@ exports.updateFranchise = async (req, res) => {
       const {
         id,
         franchiseName,
-        fullName,
+        userName,
         phoneNumber,
         email,
         franchiseCode,
         password,
         address,
+        state,
+        city
       } = req.body;
 
       if (!id) {
@@ -153,12 +195,14 @@ exports.updateFranchise = async (req, res) => {
 
       const updateData = {
         ...(franchiseName && { franchiseName }),
-        ...(fullName && { fullName }),
+        ...(userName && { userName }),
         ...(phoneNumber && { phoneNumber }),
         ...(email && { email }),
         ...(franchiseCode && { franchiseCode }),
         ...(password && { password }),
         ...(address && { address }),
+        ...(state && { state }),
+        ...(city && { city }),
       }; // Handle file upload if present
 
       if (req.file) {
@@ -194,11 +238,12 @@ exports.updateFranchise = async (req, res) => {
 
 // Login API for franchise
 exports.loginFranchise = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { userName, password, role } = req.body;
 
   try {
     // Check if the franchise exists
-    const franchise = await franchiseModel.findOne({ email, role });
+    const franchise = await franchiseModel.findOne({ userName, role });
+    console.log(franchise)
     if (!franchise) {
       return responsestatusmessage(res, false, "Invalid credentials.");
     }

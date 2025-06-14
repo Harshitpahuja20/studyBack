@@ -100,22 +100,26 @@ exports.getAdminHomeStatistics = async (req, res) => {
 exports.getFranchiseStatistics = async (req, res) => {
   const user = req.user;
   try {
-    const [totalStudents, totalCourses, totalResults] = await Promise.all([
-      studentModel.countDocuments({
-        franchiseId: new mongoose.Types.ObjectId(user?._id),
-      }),
-      VocationalCourseModel.countDocuments({
-        franchiseId: new mongoose.Types.ObjectId(user?._id),
-      }),
-      studentMarksModel.countDocuments({
-        franchiseId: new mongoose.Types.ObjectId(user?._id),
-      }),
-    ]);
+    const [totalStudents, totalAppliedResult, totalResultIssued] =
+      await Promise.all([
+        studentModel.countDocuments({
+          franchiseId: new mongoose.Types.ObjectId(user?._id),
+        }),
+        studentModel.countDocuments({
+          franchiseId: new mongoose.Types.ObjectId(user?._id),
+          result: "apply",
+        }),
+        studentModel.countDocuments({
+          franchiseId: new mongoose.Types.ObjectId(user?._id),
+          result: "done",
+        }),
+      ]);
 
     const statistics = {
       totalStudents: totalStudents || 0,
-      totalCourses: totalCourses || 0,
-      totalResults: totalResults || 0,
+      totalAppliedResult: totalAppliedResult || 0,
+      totalResultIssued: totalResultIssued || 0,
+      balance: user?.balance || 0,
     };
 
     return responsestatusdata(

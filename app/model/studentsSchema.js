@@ -6,7 +6,7 @@ const studentSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "franchise",
     },
-    studentName: {
+    studentName:  {
       type: String,
     },
     fatherName: {
@@ -37,6 +37,10 @@ const studentSchema = new mongoose.Schema(
     session: {
       type: String,
     },
+    result: {
+      type: String,
+      default : "pending"
+    },
     registrationYear: {
       type: String,
     },
@@ -47,7 +51,7 @@ const studentSchema = new mongoose.Schema(
       type: String, // store image filename or path; use Buffer if storing image as binary
     },
     enrollmentId: {
-      type: Number, // store image filename or path; use Buffer if storing image as binary
+      type: String, // store image filename or path; use Buffer if storing image as binary
     },
   },
   { timestamps: true }

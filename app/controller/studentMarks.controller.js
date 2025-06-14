@@ -5,26 +5,31 @@ const {
 } = require("../middleware/responses");
 const studentMarksModel = require("../model/studentMarks.model");
 const subjectModel = require("../model/subject.model");
+const studentModel = require("../model/studentsSchema");
 
 exports.addMarks = async (req, res) => {
   const user = req.user;
-  const { courseId, studentId, marks, issueDate } = req.body;
-  if (!courseId || !studentId || !marks || !issueDate) {
+  const { courseId, duration, studentId, marks, issueDate } = req.body;
+  if (!courseId || !studentId || !marks || !issueDate || !duration) {
     return responsestatusmessage(res, false, "All Fields are required");
   }
   const realMarks = JSON.parse(marks);
-
+  const student = await studentModel.findById(studentId);
   const studentMarks = await studentMarksModel.create({
     courseId,
     studentId,
     marks: realMarks,
     issueDate: new Date(issueDate),
+    duration: duration,
     franchiseId: new mongoose.Types.ObjectId(user?._id),
   });
 
   if (!studentMarks) {
     return responsestatusmessage(res, false, "Something went wrong!");
   }
+
+  student.result = "done";
+  await student.save();
 
   return responsestatusdata(
     res,
@@ -56,11 +61,34 @@ exports.getResultById = async (req, res) => {
 
 exports.deleteResult = async (req, res) => {
   const { id } = req.params;
-  const deleted = await studentMarksModel.findByIdAndDelete(id);
-  if(!deleted){
-    return responsestatusmessage(res, false, "Something went wrong!")
+
+  try {
+    // First, get the result
+    const result = await studentMarksModel.findById(id); // Check if result exists
+
+    if (!result) {
+      return responsestatusmessage(res, false, "Result not found!");
+    } // Get the associated student
+
+    const student = await studentModel.findById(result.studentId); // Delete the result
+
+    await studentMarksModel.deleteOne({ _id: id }); // Update the student if found
+
+    if (student) {
+      student.result = "apply";
+      await student.save();
+    }
+
+    return responsestatusmessage(
+      res,
+      true,
+      "Result Deleted Successfully",
+      result
+    );
+  } catch (error) {
+    console.error("Error deleting result:", error);
+    return responsestatusmessage(res, false, "Something went wrong!");
   }
-  return responsestatusmessage(res, true, "Result Deleted Successfully");
 };
 
 exports.updateMarks = async (req, res) => {
@@ -84,12 +112,20 @@ exports.updateMarks = async (req, res) => {
     );
 
     if (!updated) {
-      return responsestatusmessage(res, false, "Marks record not found or unauthorized");
+      return responsestatusmessage(
+        res,
+        false,
+        "Marks record not found or unauthorized"
+      );
     }
 
     return responsestatusdata(res, true, "Marks updated successfully", updated);
   } catch (error) {
     console.error("Update Error:", error);
-    return responsestatusmessage(res, false, "Server error while updating marks");
+    return responsestatusmessage(
+      res,
+      false,
+      "Server error while updating marks"
+    );
   }
 };

@@ -4,20 +4,24 @@ const {
   responsestatusmessage,
   responsestatusdata,
 } = require("../middleware/responses");
+const transactionModel = require("../model/transaction.model");
 
 // Create a new Top-Up Request
 exports.addTopUpRequest = async (req, res) => {
   try {
-    const { transactionDate, Amount, description } = req.body;
+    const { walletId, amount, description, method, date } = req.body;
+    console.log(walletId, amount, description, method, date);
 
-    if (!transactionDate || !Amount || !description) {
+    if (!walletId || !amount || !description || !method || !date) {
       return responsestatusmessage(res, false, "All fields are required.");
     }
 
     const topUpRequest = new topUpRequestModel({
-      transactionDate,
-      Amount,
+      walletId,
+      amount,
       description,
+      method,
+      date,
       franchiseId: new mongoose.Types.ObjectId(req.user?._id),
     });
 
@@ -45,14 +49,18 @@ exports.updateTopUpStatus = async (req, res) => {
       return responsestatusmessage(res, false, "ID and status are required.");
     }
 
-    const updatedRequest = await topUpRequestModel.findByIdAndUpdate(
-      id,
+    const updatedRequest = await topUpRequestModel.findOneAndUpdate(
+      { _id: id, franchiseId: req.user?._id }, // Ensuring only the franchise can update their own requests
       { status },
       { new: true }
     );
 
     if (!updatedRequest) {
-      return responsestatusmessage(res, false, "Request not found.");
+      return responsestatusmessage(
+        res,
+        false,
+        "Request not found or unauthorized."
+      );
     }
 
     return responsestatusdata(res, true, "Status updated", updatedRequest);
@@ -78,9 +86,12 @@ exports.getTopUpRequestsByFranchise = async (req, res) => {
   }
 };
 
+// Get all Top-Up Requests (Admin Access)
 exports.getAllTopUpRequests = async (req, res) => {
   try {
-    const requests = await topUpRequestModel.find({});
+    const requests = await topUpRequestModel.find({
+      status: { $ne: "pending" },
+    });
 
     return responsestatusdata(res, true, "Requests fetched", requests);
   } catch (error) {
@@ -89,14 +100,34 @@ exports.getAllTopUpRequests = async (req, res) => {
   }
 };
 
+// Get Franchise Stats (Balance and Transactions Count)
 exports.getFranchiseStats = async (req, res) => {
+  const franchiseId = req.user?._id;
+
+  // Getting balance from the user model (assuming it's stored there)
   const balance = req.user.balance || 0;
-  const franchiseId = new mongoose.Types.ObjectId(req.user._id);
 
   const transactionsCount =
-    (await topUpRequestModel.countDocuments({ franchiseId })) || 0;
+    (await transactionModel.countDocuments({ franchiseId })) || 0;
 
-    return responsestatusdata(res , true , "Fetched successfully" , {
-        balance , transactionsCount
-    }) 
+  return responsestatusdata(res, true, "Fetched successfully", {
+    balance,
+    transactionsCount,
+  });
+};
+
+// Get Franchise Transactions
+exports.getAllTransactions = async (req, res) => {
+  const user = req.user;
+
+  const transactions = await transactionModel.find({
+    franchiseId: new mongoose.Types.ObjectId(user?._id),
+  });
+
+  return responsestatusdata(
+    res,
+    true,
+    "Transactions fetched successfully",
+    transactions || []
+  );
 };
