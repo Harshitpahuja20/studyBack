@@ -3,9 +3,12 @@ const mongoose = require("mongoose");
 const topUpRequestSchema = new mongoose.Schema(
   {
     walletId: {
-      type: Date,
+      type: String,
     },
     amount: {
+      type: String,
+    },
+    transactionId: {
       type: String,
     },
     description: {

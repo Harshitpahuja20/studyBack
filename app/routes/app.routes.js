@@ -106,7 +106,7 @@ const {
   deleteResult,
   updateMarks,
 } = require("../controller/studentMarks.controller");
-const { addTopUpRequest, getFranchiseStats, getTopUpRequestsByFranchise, getAllTopUpRequests, getAllTransactions } = require("../controller/topupRequest.controller");
+const { addTopUpRequest, getFranchiseStats, getTopUpRequestsByFranchise, getAllTopUpRequests, getAllTransactions, getFranchisesForTopUp, adminAddTopUpRequest, updateTopUpStatus } = require("../controller/topupRequest.controller");
 
 const router = express.Router();
 
@@ -217,10 +217,12 @@ router.delete("/admin/result/delete/:id", authAdmin, deleteResult);
 
 // topUp routes
 router.post("/topupRequest/add", authFranchise, addTopUpRequest);
+router.post("/topupRequest/adminAddTopUpRequest", authAdmin, adminAddTopUpRequest);
 router.get("/topupRequest/view/franchise", authFranchise  , getTopUpRequestsByFranchise);
 router.get("/topupRequest/view/admin",authAdmin, getAllTopUpRequests);
-router.put("/topupRequest/update", authAdmin, updateSubject);
+router.put("/topupRequest/update/:id", authAdmin, updateTopUpStatus);
 router.get("/topupRequest/stats", authFranchise, getFranchiseStats);
 router.get("/topupRequest/getAllTransactions", authFranchise, getAllTransactions);
+router.get("/topupRequest/getFranchisesForTopUp", authAdmin, getFranchisesForTopUp);
 
 module.exports = router;
