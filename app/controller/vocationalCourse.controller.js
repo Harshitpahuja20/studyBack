@@ -13,7 +13,7 @@ exports.addVocationalCourse = async (req, res) => {
 
     if (!name || !duration || !mode || !code || !amount) {
       return responsestatusmessage(res, false, "All fields are required.");
-    }
+    } 
 
     const newCourse = new VocationalCourseModel({
       name,
