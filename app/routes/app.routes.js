@@ -116,7 +116,7 @@ router.post("/login", loginFranchise);
 router.get("/franchise/view", getFranchises);
 router.get("/franchise/:id", getSingleFranchise);
 router.put("/franchise/update", updateFranchise);
-router.put("/franchise/delete", deleteFranchise);
+router.put("/franchise/:id", deleteFranchise);
 router.put("/franchise/addBalance", addBalance);
 router.get("/getCurrentRole", getUser, getCurrentRole);
 

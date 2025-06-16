@@ -269,7 +269,7 @@ exports.loginFranchise = async (req, res) => {
 
 // Delete a franchise by ID
 exports.deleteFranchise = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
 
   try {
     const deletedFranchise = await franchiseModel.findByIdAndDelete(id);
