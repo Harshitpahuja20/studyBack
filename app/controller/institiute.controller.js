@@ -105,9 +105,6 @@ exports.getInstitutes = async (req, res) => {
             ],
             as: "linkedStreams",
           },
-        },
-        {
-          $match: { "linkedStreams.0": { $exists: true } },
         }
       );
     } // Project final fields: always include _id, title, and linkedStreams if present
