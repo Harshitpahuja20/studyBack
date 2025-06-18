@@ -471,7 +471,7 @@ exports.studentResult = async (req, res) => {
   const { enrollmentId, duration } = req.body;
   console.log(enrollmentId, duration);
   const student = await studentModel
-    .findOne({ enrollmentId: Number(enrollmentId) })
+    .findOne({ enrollmentId: enrollmentId})
     .populate("course", "name duration");
 
   if (!student) {
