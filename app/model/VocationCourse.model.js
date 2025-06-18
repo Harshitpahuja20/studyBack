@@ -16,8 +16,7 @@ const VocationalCourseSchema = new mongoose.Schema(
     },
     code: {
       type: String,
-      trim: true,
-      unique: true,
+      trim: true
     },
     amount: {
       type: Number,
