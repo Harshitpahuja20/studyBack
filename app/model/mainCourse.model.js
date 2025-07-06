@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const mainCourseSchema = new mongoose.Schema(
   {
     streamId: {
-      type: String,
+      type: mongoose.Types.ObjectId,
       trim: true,
     },
     streamName: {

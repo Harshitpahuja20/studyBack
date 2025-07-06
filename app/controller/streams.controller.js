@@ -63,7 +63,16 @@ exports.deleteStream = async (req, res) => {
 // Get all streams
 exports.getStreams = async (req, res) => {
   try {
-    const streams = await streamModel.find({});
+    const streams = await streamModel.aggregate([
+      {
+        $lookup: {
+          from: "maincourses",
+          localField: "_id",
+          foreignField: "streamId",
+          as: "mainCourse",
+        },
+      },
+    ]);
     return responsestatusdata(res, true, "Fetched Successfully", streams);
   } catch (error) {
     return responsestatusmessage(res, false, "Error fetching streams");
@@ -120,14 +129,14 @@ exports.updateAttachment = async (req, res) => {
       return responsestatusmessage(
         res,
         false,
-        'University must be an array of string ObjectIds.'
+        "University must be an array of string ObjectIds."
       );
     }
 
     // Convert valid ObjectIds
-    const universityObjectIds = University
-      .filter((id) => mongoose.isValidObjectId(id))
-      .map((id) => new mongoose.Types.ObjectId(id));
+    const universityObjectIds = University.filter((id) =>
+      mongoose.isValidObjectId(id)
+    ).map((id) => new mongoose.Types.ObjectId(id));
 
     const updatedStream = await streamModel.findByIdAndUpdate(
       streamId,
@@ -136,18 +145,17 @@ exports.updateAttachment = async (req, res) => {
     );
 
     if (!updatedStream) {
-      return responsestatusmessage(res, false, 'Stream not found');
+      return responsestatusmessage(res, false, "Stream not found");
     }
 
     return responsestatusdata(
       res,
       true,
-      'Attachment updated successfully',
+      "Attachment updated successfully",
       updatedStream
     );
   } catch (error) {
-    console.error('Error in updateAttachment:', error);
-    return responsestatusmessage(res, false, 'Server error');
+    console.error("Error in updateAttachment:", error);
+    return responsestatusmessage(res, false, "Server error");
   }
 };
-
