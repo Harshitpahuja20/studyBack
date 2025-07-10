@@ -88,26 +88,45 @@ exports.getInstitutes = async (req, res) => {
     const pipeline = [{ $match: matches }];
 
     if (role === "University") {
-      pipeline.push(
-        {
-          $lookup: {
-            from: "streams",
-            let: { instituteId: "$_id" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: { $in: ["$$instituteId", "$university"] },
-                },
-              },
-              {
-                $project: { _id: 1, title: 1 },
-              },
-            ],
-            as: "linkedStreams",
-          },
-        }
-      );
-    } // Project final fields: always include _id, title, and linkedStreams if present
+  pipeline.push(
+    {
+      $lookup: {
+        from: "streams",
+        let: { instituteId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ["$$instituteId", "$university"] },
+            },
+          },
+          {
+            $project: { _id: 1, title: 1 },
+          },
+        ],
+        as: "linkedStreams",
+      },
+    },
+    // 👇 Second lookup: fetch mainCourses where streamId in linkedStreams._id
+    {
+      $lookup: {
+        from: "maincourses",
+        let: { streamIds: "$linkedStreams._id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ["$streamId", "$$streamIds"] },
+            },
+          },
+          {
+            $project: { _id: 1, heading: 1, shortName: 1 }, // Adjust fields as needed
+          },
+        ],
+        as: "mainCourses",
+      },
+    }
+  );
+}
+ // Project final fields: always include _id, title, and linkedStreams if present
 
     const institutes = await instituteModel.aggregate(pipeline);
 
