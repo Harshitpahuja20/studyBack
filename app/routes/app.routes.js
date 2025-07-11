@@ -79,6 +79,7 @@ const {
   deleteSubCourse,
   updateSubCourse,
   getSubCoursesbyId,
+  getSubCoursebyId,
 } = require("../controller/SubCourse.controller");
 const {
   addVocationalCourse,
@@ -157,6 +158,7 @@ router.put("/mainCourse/update", authAdmin, updateMainCourse);
 router.post("/subCourse/add", authAdmin, addSubCourse);
 router.get("/subCourse/view", getSubCourses);
 router.get("/subCourse/view/:id", getSubCoursesbyId);
+router.get("/subCourse/single/:id", getSubCoursebyId);
 router.delete("/subCourse/delete/:id", authAdmin, deleteSubCourse);
 router.put("/subCourse/update", authAdmin, updateSubCourse);
 

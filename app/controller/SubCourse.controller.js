@@ -136,6 +136,19 @@ exports.getSubCoursesbyId = async (req, res) => {
   try {
     const subCourses = await subCourseModel.find({
       mainCourseId: new mongoose.Types.ObjectId(id),
+    }).select("-description");
+    return responsestatusdata(res, true, "Fetched Successfully", subCourses);
+  } catch (error) {
+    console.error(error);
+    return responsestatusmessage(res, false, "Error fetching sub-courses.");
+  }
+};
+
+exports.getSubCoursebyId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const subCourses = await subCourseModel.findOne({
+      _id: new mongoose.Types.ObjectId(id),
     });
     return responsestatusdata(res, true, "Fetched Successfully", subCourses);
   } catch (error) {
