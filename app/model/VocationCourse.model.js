@@ -8,7 +8,7 @@ const VocationalCourseSchema = new mongoose.Schema(
     },
     duration: {
       type: String,
-      enum: ["3 MONTH", "6 MONTH", "1 YEAR", "2 YEAR", "3 YEAR", "4 YEAR"],
+      enum: ["45 DAYS" , "3 MONTH", "6 MONTH", "1 YEAR", "2 YEAR", "3 YEAR", "4 YEAR"],
     },
     mode: {
       type: Number,
