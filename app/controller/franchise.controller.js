@@ -267,6 +267,20 @@ exports.loginFranchise = async (req, res) => {
   }
 };
 
+exports.updatePassword = async (req, res) => {
+  try {
+    const {password} = req?.body
+    const user = req.user;
+    const franchise = await franchiseModel.findById(user?._id);
+    franchise.password = password;
+    await franchise.save()
+    return responsestatusdata(res, true, "updated Successfully", user);
+  } catch (error) {
+    return responsestatusmessage(res, false, error?.message);
+  }
+};
+
+
 // Delete a franchise by ID
 exports.deleteFranchise = async (req, res) => {
   const { id } = req.params;

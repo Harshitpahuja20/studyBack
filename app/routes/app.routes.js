@@ -23,6 +23,7 @@ const {
   deleteFranchise,
   updateFranchise,
   addBalance,
+  updatePassword
 } = require("../controller/franchise.controller");
 const {
   getUser,
@@ -114,6 +115,7 @@ const router = express.Router();
 // franchise as user
 router.post("/franchise/add", addFranchise);
 router.post("/login", loginFranchise);
+router.post("/updatePassword", authAdmin , updatePassword);
 router.get("/franchise/view", getFranchises);
 router.get("/franchise/:id", getSingleFranchise);
 router.put("/franchise/update", updateFranchise);
