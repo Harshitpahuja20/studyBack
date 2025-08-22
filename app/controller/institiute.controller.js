@@ -154,7 +154,7 @@ exports.updateInstitute = async (req, res) => {
         role,
       } = req.body;
 
-      if (!id || !instituteName || !instituteUrl || !description) {
+      if (!id || !instituteName || !description) {
         return responsestatusmessage(
           res,
           false,
@@ -176,7 +176,6 @@ exports.updateInstitute = async (req, res) => {
 
       // Update fields
       existingInstitute.instituteName = instituteName;
-      existingInstitute.instituteUrl = instituteUrl;
       existingInstitute.address = address;
       existingInstitute.approvedBy = approvedBy;
       existingInstitute.city = city;

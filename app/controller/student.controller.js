@@ -443,7 +443,6 @@ exports.deleteStudent = async (req, res) => {
 };
 
 // student verificaation
-
 exports.studentVerification = async (req, res) => {
   const { enrollmentId, dob } = req.body;
 
@@ -453,7 +452,7 @@ exports.studentVerification = async (req, res) => {
     return responsestatusmessage(res, false, "Both fields are reuired");
   }
 
-  const student = await studentModel.findOne({ enrollmentId, dob });
+  const student = await studentModel.findOne({ enrollmentId, dob }).populate("course", "name duration");;
 
   if (!student) {
     return responsestatusmessage(
