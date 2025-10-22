@@ -21,6 +21,7 @@ exports.addFranchise = async (req, res) => {
         city,
         address,
         role,
+        password
       } = req.body;
 
       // If role is admin, only userName, email, and password are required
